@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3288696689422864483}
   - component: {fileID: 3288696689422864482}
   - component: {fileID: 1159282025018426796}
+  - component: {fileID: 4239581609857904253}
   m_Layer: 5
   m_Name: Image
   m_TagString: PuzzleButton
@@ -121,3 +122,16 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &4239581609857904253
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3288696689422864480}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 872848952ba3e0a419c89c33c622d0f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cardId: 0
