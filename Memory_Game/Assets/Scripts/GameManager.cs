@@ -15,7 +15,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Transform cardParent;
 
     [SerializeField] private Sprite[] allSprites;
-    [SerializeField] private List<Sprite> gameSprites = new List<Sprite>(); 
+    [SerializeField] private List<Sprite> gameSprites = new List<Sprite>();
+
+    public bool isSelectedFirst, isSelectedSecond;
+    public int firstCard, secondCard;
 
     [Header("Menu Canvas")]
     [SerializeField] private Transform levelButtonParent;
@@ -55,10 +58,13 @@ public class GameManager : MonoBehaviour
         }
         GetButton();
         AddListeners();
+        AddGameSprites();
+        Shuffle(gameSprites);
     }
     public void GetButton()
     {
         allButtons.Clear();
+        gameSprites.Clear();
         GameObject[] objects = GameObject.FindGameObjectsWithTag("PuzzleButton");
         for(int i =0;i<objects.Length;i++)
         {
@@ -83,12 +89,75 @@ public class GameManager : MonoBehaviour
         }
     }
 
-   
+
+    void AddGameSprites()
+    {
+        int total = allButtons.Count;
+        int index = 0;
+        for (int i = 0; i < total; i++)
+        {
+            if (index == total / 2)
+                index = 0;
+
+
+            gameSprites.Add(allSprites[index]);
+            index++;
+        }
+    }
+    void Shuffle<T>(List<T> list)
+    {
+        int n = list.Count;
+
+        while (n > 1)
+        {
+            n--;
+            int k = Random.Range(0, n + 1);
+            T value = list[k];
+            list[k] = list[n];
+            list[n] = value;
+        }
+    }
     public void OnButtonClicked()
     {
         string name = EventSystem.current.currentSelectedGameObject.name;
         Debug.Log("u have clicked the button "+ name);
+
+        if (!isSelectedFirst)
+        {
+            isSelectedFirst = true;
+            firstCard = int.Parse(name);
+            allButtons[firstCard].transform.GetComponent<Image>().sprite = gameSprites[firstCard];
+        }
+        else if(!isSelectedSecond)
+        {
+            isSelectedSecond = true;
+            secondCard = int.Parse(name);
+            allButtons[secondCard].transform.GetComponent<Image>().sprite = gameSprites[secondCard];
+        }
+
+        if(isSelectedFirst && isSelectedSecond)
+        {
+            if(gameSprites[firstCard].name == gameSprites[secondCard].name)
+            {
+                Debug.Log("Match");
+                allButtons[secondCard].transform.GetComponent<Image>().enabled = false;
+                allButtons[firstCard].transform.GetComponent<Image>().enabled = false;
+
+            }
+            else
+            {
+                Debug.Log("not Match");
+                allButtons[secondCard].transform.GetComponent<Image>().sprite = cardBg;
+                allButtons[firstCard].transform.GetComponent<Image>().sprite = cardBg;
+            }
+            isSelectedFirst = isSelectedSecond = false;
+            firstCard = secondCard = -1;
+        }
     }
+
+
+
+    
     public void DestroyCards()
     {
         for (int i = 0; i < cardParent.childCount; i++)
