@@ -59,8 +59,8 @@ public class GameManager : MonoBehaviour
 
     [Header("Save Data")]
 
-     public LevelDataList saveDataList = new LevelDataList();
-   // public List<LevelData> levelDataList = new List<LevelData>();
+    public LevelDataList saveDataList = new LevelDataList();
+    // public List<LevelData> levelDataList = new List<LevelData>();
 
 
     private string filepath;
@@ -69,14 +69,40 @@ public class GameManager : MonoBehaviour
     public LevelDataList loadedData;
     void Start()
     {
-       
-        filepath = Path.Combine(Application.persistentDataPath, "emptyData.json");
-        
-        
+
+        filepath = Path.Combine(Application.persistentDataPath, "gameData.json");
+
+
+        if (!File.Exists(filepath))
+        {
+            // If it doesn't exist, create an empty JSON file
+            CreateEmptyJsonFile();
+        }
+        else
+        {
+            Debug.Log("Exists");
+            // If it exists, load the data from the JSON file
+            LoadJson();
+        }
+
 
         allSprites = Resources.LoadAll<Sprite>("Sprites");
         GenerateLevel();
     }
+    private void CreateEmptyJsonFile()
+    {
+       
+        saveDataList = new LevelDataList();
+
+        
+        string json = JsonUtility.ToJson(saveDataList, true);
+
+        
+        File.WriteAllText(filepath, json);
+
+        Debug.Log("Empty JSON file created at: " + filepath);
+    }
+
     public void GenerateLevel()
     {
         turnCount = 0;
@@ -330,10 +356,20 @@ public class GameManager : MonoBehaviour
     }
     public void LoadJson()
     {
+        Debug.Log("LoadingJSon");
         string json = File.ReadAllText(filepath);
         LevelDataList levelData = JsonUtility.FromJson<LevelDataList>(json);
         loadedData.data = levelData.data;
-        
+        if (levelData != null && levelData.data != null)
+        {
+            for (int i = 0; i < loadedData.data.Count; i++)
+            {
+               
+                highScore[i].text = loadedData.data[i].playerScore.ToString();
+            }
+        }
+       
+
 
     }
     void StartWaiting(float timeToWait, Action action)

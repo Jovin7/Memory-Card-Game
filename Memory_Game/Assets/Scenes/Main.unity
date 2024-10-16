@@ -4353,9 +4353,10 @@ MonoBehaviour:
   turnCountText: {fileID: 1059642778}
   ScoreText: {fileID: 461082666}
   audioSource: {fileID: 936112493}
-  totalList:
+  saveDataList:
     data: []
-  saveDataList: []
+  loadedData:
+    data: []
 --- !u!1 &1978825540
 GameObject:
   m_ObjectHideFlags: 0
