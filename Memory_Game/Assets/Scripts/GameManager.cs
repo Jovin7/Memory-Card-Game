@@ -26,8 +26,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Sprite[] allSprites;
     [SerializeField] private List<Sprite> gameSprites = new List<Sprite>();
 
-    public bool isSelectedFirst, isSelectedSecond;
-    public int firstCard, secondCard;
+    //public bool isSelectedFirst, isSelectedSecond;
+    public int firstCard;
+
+    public int previousCard;
 
     public Queue<int> numberQueue = new Queue<int>();
     [Header("Canvas")]
@@ -80,7 +82,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("Exists");
+           // Debug.Log("Exists");
             // If it exists, load the data from the JSON file
             LoadJson();
         }
@@ -100,7 +102,7 @@ public class GameManager : MonoBehaviour
         
         File.WriteAllText(filepath, json);
 
-        Debug.Log("Empty JSON file created at: " + filepath);
+       // Debug.Log("Empty JSON file created at: " + filepath);
     }
 
     public void GenerateLevel()
@@ -174,7 +176,7 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning("Object " + objects[i].name + " does not have a Button component!");
+              //  Debug.LogWarning("Object " + objects[i].name + " does not have a Button component!");
             }
         }
     }
@@ -216,74 +218,77 @@ public class GameManager : MonoBehaviour
             list[n] = value;
         }
     }
-    public void OnButtonClicked()
-    {
-        string name = EventSystem.current.currentSelectedGameObject.name;
+    //public void OnButtonClicked()
+    //{
+    //    string name = EventSystem.current.currentSelectedGameObject.name;
+    //    if (!isSelectedFirst)
+    //    {
+    //        Debug.Log("1111");
+    //        isSelectedFirst = true;
+    //        firstCard = int.Parse(name);
+    //        numberQueue.Enqueue(firstCard);
+    //        allButtons[firstCard].transform.GetComponent<Image>().sprite = gameSprites[firstCard];
+
+    //    }
+    //    else if (!isSelectedSecond)
+    //    {
+    //        Debug.Log("22222");
+    //        isSelectedSecond = true;
+    //        secondCard = int.Parse(name);
+    //        numberQueue.Enqueue(secondCard);
+    //        allButtons[secondCard].transform.GetComponent<Image>().sprite = gameSprites[secondCard];
+    //    }
+
+    //    if (isSelectedFirst && isSelectedSecond)
+    //    {
+    //        Debug.Log("3333");
+
+    //        if (gameSprites[firstCard].name == gameSprites[secondCard].name)
+    //        {
+
+    //            Debug.Log("Match44444");
+    //            StartWaiting(2, () =>
+    //            {
+    //                allButtons[secondCard].transform.GetComponent<Image>().enabled = false;
+    //                allButtons[firstCard].transform.GetComponent<Image>().enabled = false;
+    //                isSelectedFirst = isSelectedSecond = false;
+    //                firstCard = secondCard = -1;
+
+    //            });
 
 
+    //        }
+    //        else
+    //        {
+    //            Debug.Log("not Match55555555555");
+    //            StartWaiting(2, () =>
+    //            {
+    //                allButtons[secondCard].transform.GetComponent<Image>().sprite = cardBg;
+    //                allButtons[firstCard].transform.GetComponent<Image>().sprite = cardBg;
+    //                isSelectedFirst = isSelectedSecond = false;
+    //                firstCard = secondCard = -1;
+    //                //  mask.SetActive(false);
+    //            });
 
-        if (!isSelectedFirst)
-        {
-            Debug.Log("1111");
-            isSelectedFirst = true;
-            firstCard = int.Parse(name);
-            numberQueue.Enqueue(firstCard);
-            allButtons[firstCard].transform.GetComponent<Image>().sprite = gameSprites[firstCard];
+    //        }
 
-        }
-        else if (!isSelectedSecond)
-        {
-            Debug.Log("22222");
-            isSelectedSecond = true;
-            secondCard = int.Parse(name);
-            numberQueue.Enqueue(secondCard);
-            allButtons[secondCard].transform.GetComponent<Image>().sprite = gameSprites[secondCard];
-        }
-
-        if (isSelectedFirst && isSelectedSecond)
-        {
-            Debug.Log("3333");
-
-            if (gameSprites[firstCard].name == gameSprites[secondCard].name)
-            {
-
-                Debug.Log("Match44444");
-                StartWaiting(2, () =>
-                {
-                    allButtons[secondCard].transform.GetComponent<Image>().enabled = false;
-                    allButtons[firstCard].transform.GetComponent<Image>().enabled = false;
-                    isSelectedFirst = isSelectedSecond = false;
-                    firstCard = secondCard = -1;
-
-                });
-
-
-            }
-            else
-            {
-                Debug.Log("not Match55555555555");
-                StartWaiting(2, () =>
-                {
-                    allButtons[secondCard].transform.GetComponent<Image>().sprite = cardBg;
-                    allButtons[firstCard].transform.GetComponent<Image>().sprite = cardBg;
-                    isSelectedFirst = isSelectedSecond = false;
-                    firstCard = secondCard = -1;
-                    //  mask.SetActive(false);
-                });
-
-            }
-
-        }
-    }
+    //    }
+    //}
     public void ButtonClickTest()
     {
         string name = EventSystem.current.currentSelectedGameObject.name;
 
-        Debug.Log("1111");
+       // Debug.Log("1111");
 
         int cardIndex = int.Parse(name);
         numberQueue.Enqueue(cardIndex);
         allButtons[cardIndex].transform.GetComponent<Image>().sprite = gameSprites[cardIndex];
+        Card a = allButtons[cardIndex].transform.GetComponent<Card>();
+        a.StartCoroutine(a.RotateCard(a.transform, gameSprites[cardIndex], cardBg));
+
+        if (previousCard == -1)
+            previousCard = cardIndex;
+
         Comparison();
 
 
@@ -291,10 +296,10 @@ public class GameManager : MonoBehaviour
     }
     void Comparison()
     {
-        Debug.Log(" Comparison");
+      //  Debug.Log(" Comparison");
         if (numberQueue.Count < 2)
         {
-            Debug.Log(" no Comparison");
+           // Debug.Log(" no Comparison");
             return;
         }
 
@@ -313,13 +318,17 @@ public class GameManager : MonoBehaviour
 
             StartWaiting(1, () =>
             {
-                allButtons[firstElement].transform.GetComponent<Image>().enabled = false;
-                allButtons[secondElement].transform.GetComponent<Image>().enabled = false;
+                
+
+                Card a = allButtons[firstElement].transform.GetComponent<Card>();
+                Card b = allButtons[secondElement].transform.GetComponent<Card>();
+                a.StartCoroutine(a.FadeCard(a.GetComponent<Image>(), 1f));
+                b.StartCoroutine(b.FadeCard(b.GetComponent<Image>(), 1f));
 
                 totalMatchCount--;
                 if (totalMatchCount == 0)
                 {
-                    Debug.Log("GameOver");
+                   // Debug.Log("GameOver");
                     gameCanvas.SetActive(false);
                     gameOverCanvas.SetActive(true);
                     Score = matchCount * 10;
@@ -328,8 +337,7 @@ public class GameManager : MonoBehaviour
 
                     LevelData levelData = new LevelData(levelCount, Score);
                     saveDataList.data.Add(levelData);
-                    //levelDataList.Add(levelData);
-                    // SaveData(datat);
+                  
                     Save(saveDataList);
                 }
 
@@ -337,17 +345,26 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("doesnot match");
+     
+            //Debug.Log("doesnot match");
             StartWaiting(1, () =>
             {
-                allButtons[firstElement].transform.GetComponent<Image>().sprite = cardBg;
-                allButtons[secondElement].transform.GetComponent<Image>().sprite = cardBg;
+                Card a = allButtons[firstElement].transform.GetComponent<Card>();
+                Card b = allButtons[secondElement].transform.GetComponent<Card>();
+                a.StartCoroutine(a.RotateCard(a.transform, gameSprites[firstElement], cardBg));
+                b.StartCoroutine(b.RotateCard(b.transform, gameSprites[secondElement], cardBg));
+
+
+                //allButtons[firstElement].transform.GetComponent<Image>().sprite = cardBg;
+                //allButtons[secondElement].transform.GetComponent<Image>().sprite = cardBg;
 
             });
 
         }
 
     }
+
+    
 
     public void Save(LevelDataList listdata)
     {
@@ -356,7 +373,7 @@ public class GameManager : MonoBehaviour
     }
     public void LoadJson()
     {
-        Debug.Log("LoadingJSon");
+      // Debug.Log("LoadingJSon");
         string json = File.ReadAllText(filepath);
         LevelDataList levelData = JsonUtility.FromJson<LevelDataList>(json);
         loadedData.data = levelData.data;
